@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel • Pom Pom Blogs</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* LOGIN */
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #07070a;
+        }
+
+        .login-box {
+            background: #1a1a1a;
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+
+        .login-box h2 { text-align: center; margin-bottom: 0.5rem; color: #6c63ff; }
+        .login-box p { text-align: center; color: #a0a0c0; margin-bottom: 2rem; }
+
+        .form-group { margin-bottom: 1.5rem; }
+
+        .login-box input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #2d2d2d;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .login-box input:focus { border-color: #6c63ff; outline: none; }
+
+        .login-box .login-error {
+            color: #dc3545;
+            text-align: center;
+            display: none;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 0.75rem;
+            background: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-box button:hover { background: #7b73ff; transform: translateY(-2px); }
+
+        .login-box .hint {
+            text-align: center;
+            color: #6a6a8a;
+            font-size: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* DASHBOARD */
+        .admin-dashboard { display: none; }
+        .admin-dashboard.active { display: block; }
+
+        .admin-nav {
+            background: #1a1a1a;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .admin-nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .admin-nav .logo { color: #6c63ff; font-size: 1.5rem; font-weight: 700; text-decoration: none; }
+        .admin-nav .admin-badge { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+        .admin-nav .admin-badge span {
+            background: #6c63ff;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .admin-nav .logout-btn {
+            background: transparent;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            padding: 0.4rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .admin-nav .logout-btn:hover { background: #dc3545; color: white; }
+
+        .admin-nav .back-link {
+            color: #a0a0c0;
+            text-decoration: none;
+            padding: 0.4rem 1rem;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .admin-nav .back-link:hover { background: #2d2d2d; color: white; }
+
+        .admin-panel {
+            max-width: 800px;
+            margin: 2rem auto 3rem;
+            background: #1a1a1a;
+            padding: 2.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .admin-panel h2 { margin-bottom: 0.25rem; }
+        .admin-panel .subtitle { color: #a0a0c0; margin-bottom: 2rem; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #a0a0c0;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #2d2d2d;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #6c63ff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+
+        .form-group textarea { min-height: 100px; resize: vertical; }
+        .form-group small { display: block; margin-top: 0.5rem; color: #6a6a8a; font-size: 0.85rem; }
+
+        .special-note-area {
+            background: rgba(108, 99, 255, 0.05);
+            border: 1px solid rgba(108, 99, 255, 0.15);
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .special-note-area label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6c63ff !important;
+            font-weight: 600 !important;
+        }
+
+        .dynamic-section {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .dynamic-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .dynamic-section-header label {
+            margin-bottom: 0 !important;
+            color: #a0a0c0;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .btn-add-row {
+            background: rgba(108, 99, 255, 0.12);
+            color: #6c63ff;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-add-row:hover { background: rgba(108, 99, 255, 0.2); }
+
+        .task-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            flex-wrap: wrap;
+        }
+
+        .task-row:hover { border-color: rgba(108, 99, 255, 0.15); }
+
+        .task-row input {
+            flex: 1;
+            padding: 0.6rem 0.8rem;
+            background: #2d2d2d;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.9rem;
+            min-width: 100px;
+        }
+
+        .task-row input:focus { border-color: #6c63ff; outline: none; }
+
+        .btn-remove-row {
+            background: transparent;
+            border: none;
+            color: #dc3545;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
+
+        .btn-remove-row:hover { background: rgba(220, 53, 69, 0.1); }
+
+        .row-index {
+            background: linear-gradient(135deg, #6c63ff, #a855f7);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .timer-display {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary {
+            padding: 0.75rem 2rem;
+            background: #6c63ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover { background: #7b73ff; transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-secondary {
+            padding: 0.75rem 2rem;
+            background: #2d2d2d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-secondary:hover { background: #3d3d3d; }
+
+        .admin-posts { margin-top: 3rem; }
+        .admin-posts h3 { margin-bottom: 1.5rem; }
+
+        .admin-post {
+            background: #1a1a1a;
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: 0.3s;
+        }
+
+        .admin-post:hover { border-color: rgba(108, 99, 255, 0.3); }
+
+        .admin-post-info { flex: 1; min-width: 0; }
+        .admin-post-info h4 { margin-bottom: 0.25rem; }
+
+        .admin-post-info p {
+            color: #a0a0c0;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .post-badges { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+
+        .badge {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 50px;
+            background: rgba(108, 99, 255, 0.12);
+            color: #6c63ff;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .badge.special { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
+        .badge.task { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+        .admin-post-info small { color: #6a6a8a; font-size: 0.8rem; }
+        .admin-post-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+
+        .btn-danger, .btn-edit {
+            padding: 0.4rem 1.2rem;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-danger { background: #dc3545; }
+        .btn-danger:hover { background: #c82333; }
+
+        .btn-edit { background: #6c63ff; }
+        .btn-edit:hover { background: #7b73ff; }
+
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            background: #28a745;
+            color: white;
+            border-radius: 12px;
+            display: none;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-weight: 500;
+        }
+
+        #toast.error { background: #dc3545; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .loading { text-align: center; padding: 2rem; }
+
+        .spinner {
+            border: 4px solid #2d2d2d;
+            border-top: 4px solid #6c63ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #a0a0c0;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 2px dashed rgba(255, 255, 255, 0.06);
+        }
+
+        @media (max-width: 768px) {
+            .admin-panel { padding: 1.5rem; margin: 1rem auto; }
+            .admin-post { flex-direction: column; gap: 1rem; }
+            .form-actions { flex-direction: column; }
+            .task-row { flex-direction: column; align-items: stretch; }
+            .task-row input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN PAGE -->
+    <div class="login-page" id="loginPage">
+        <div class="login-box">
+            <h2>🔐 Admin Access</h2>
+            <p>Enter your credentials</p>
+            <div class="login-error" id="loginError">Invalid username or password</div>
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Username">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Password">
+            </div>
+            <button onclick="login()">Login</button>
+            <div class="hint">Default: sasi / sasi</div>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div class="admin-dashboard" id="adminDashboard">
+        <nav class="admin-nav">
+            <div class="container">
+                <a href="#" class="logo">✦ Admin Panel</a>
+                <div class="admin-badge">
+                    <a href="index.html" class="back-link">← Back to Site</a>
+                    <span>Admin</span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container">
+            <div class="admin-panel">
+                <h2 id="formTitle">📝 Create New Post</h2>
+                <p class="subtitle" id="formSubtitle">Add a new post with step tasks</p>
+
+                <form id="post-form">
+                    <input type="hidden" id="edit-id">
+                    <input type="hidden" id="existing-image">
+
+                    <div class="form-group">
+                        <label>Caption *</label>
+                        <input type="text" id="caption" placeholder="Enter post caption" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="description" placeholder="Write description..."></textarea>
+                    </div>
+
+                    <div class="special-note-area">
+                        <label>📌 Special Note</label>
+                        <textarea id="special-note" placeholder="Add a special note..." rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Image</label>
+                        <input type="file" id="image" accept="image/*">
+                        <small>Max 5MB</small>
+                    </div>
+
+                    <!-- TASK STEPS -->
+                    <div class="dynamic-section">
+                        <div class="dynamic-section-header">
+                            <label>🎯 Step Tasks (each 5s timer)</label>
+                            <button type="button" class="btn-add-row" onclick="addTaskRow()">+ Add Step</button>
+                        </div>
+                        <div id="tasks-wrapper"></div>
+                        <small style="color:#6a6a8a;font-size:0.8rem;">Each step = 1 task link with 5-second countdown</small>
+                    </div>
+
+                    <!-- FINAL BUTTON -->
+                    <div class="dynamic-section">
+                        <div class="dynamic-section-header">
+                            <label>🔓 Final Unlock Settings</label>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label style="font-size: 0.85rem;">Final Button Text</label>
+                            <input type="text" id="final-button-text" placeholder="Unlock Now" value="Unlock Now">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label style="font-size: 0.85rem;">🔗 Decoy Link (1st click - Ad)</label>
+                            <input type="url" id="decoy-link" placeholder="https://ad-link.com">
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="font-size: 0.85rem;">✅ Final Link (2nd click - Real)</label>
+                            <input type="url" id="final-link" placeholder="https://real-download.com">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" id="submit-btn">✨ Create Post</button>
+                        <button type="button" class="btn-secondary" onclick="resetForm()">🗑️ Clear</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="admin-posts">
+                <h3>📚 Your Posts</h3>
+                <div id="admin-posts-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast"></div>
+
+    <!-- LOGIN + UI LOGIC -->
+    <script>
+        const ADMIN_USER = 'sasi';
+        const ADMIN_PASS = 'sasi';
+
+        function login() {
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            const err = document.getElementById('loginError');
+
+            if (u === ADMIN_USER && p === ADMIN_PASS) {
+                err.style.display = 'none';
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('adminDashboard').classList.add('active');
+                if (typeof window.loadAdminPosts === 'function') window.loadAdminPosts();
+            } else {
+                err.style.display = 'block';
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('adminDashboard').classList.remove('active');
+            document.getElementById('password').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('adminDashboard').classList.add('active');
+                if (typeof window.loadAdminPosts === 'function') window.loadAdminPosts();
+            }
+            ['username', 'password'].forEach(id => {
+                document.getElementById(id).addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') login();
+                });
+            });
+        });
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = isError ? 'error' : '';
+            t.style.display = 'block';
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => { t.style.display = 'none'; }, 3000);
+        }
+
+        function addTaskRow(name = '', url = '') {
+            const wrapper = document.getElementById('tasks-wrapper');
+            const index = wrapper.children.length + 1;
+            const row = document.createElement('div');
+            row.className = 'task-row';
+            row.innerHTML = `
+                <span class="row-index">${index}</span>
+                <input type="text" class="task-name" placeholder="Task name (e.g. Watch Video)" value="${name}">
+                <input type="url" class="task-url" placeholder="https://ad-link.com" value="${url}">
+                <span class="timer-display">⏱ 5s</span>
+                <button type="button" class="btn-remove-row" onclick="removeTaskRow(this)">✕</button>
+            `;
+            wrapper.appendChild(row);
+        }
+
+        function removeTaskRow(btn) {
+            const wrapper = document.getElementById('tasks-wrapper');
+            if (wrapper.children.length > 1) {
+                btn.closest('.task-row').remove();
+                updateTaskIndices();
+            } else {
+                showToast('At least one task required', true);
+            }
+        }
+
+        function updateTaskIndices() {
+            document.querySelectorAll('.task-row').forEach((row, i) => {
+                row.querySelector('.row-index').textContent = i + 1;
+            });
+        }
+
+        function getTasksData() {
+            const tasks = [];
+            document.querySelectorAll('.task-row').forEach(row => {
+                const name = row.querySelector('.task-name').value.trim();
+                const url = row.querySelector('.task-url').value.trim();
+                if (name && url) {
+                    tasks.push({ name, url, timer: 5 });
+                }
+            });
+            return tasks;
+        }
+
+        function setTasksData(tasks) {
+            const wrapper = document.getElementById('tasks-wrapper');
+            wrapper.innerHTML = '';
+            if (tasks && tasks.length > 0) {
+                tasks.forEach(t => addTaskRow(t.name || '', t.url || ''));
+            } else {
+                addTaskRow();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('post-form').reset();
+            document.getElementById('edit-id').value = '';
+            document.getElementById('existing-image').value = '';
+            document.getElementById('submit-btn').textContent = '✨ Create Post';
+            document.getElementById('formTitle').textContent = '📝 Create New Post';
+            document.getElementById('formSubtitle').textContent = 'Add a new post with step tasks';
+            document.getElementById('final-button-text').value = 'Unlock Now';
+            setTasksData([]);
+        }
+
+        window.login = login;
+        window.logout = logout;
+        window.showToast = showToast;
+        window.addTaskRow = addTaskRow;
+        window.removeTaskRow = removeTaskRow;
+        window.getTasksData = getTasksData;
+        window.setTasksData = setTasksData;
+        window.resetForm = resetForm;
+    </script>
+
+    <!-- SUPABASE + POSTS LOGIC -->
+    <script type="module">
+        const SUPABASE_URL = 'https://oofuqokpdvlomtnjvfvk.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_nt4makZoISds9-x7ID1_0Q_xYIrBdK5';
+
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Admin Supabase Connected');
+
+        const list = document.getElementById('admin-posts-list');
+        const form = document.getElementById('post-form');
+        const submitBtn = document.getElementById('submit-btn');
+
+        window.loadAdminPosts = async function () {
+            if (!list) return;
+            try {
+                list.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading...</p></div>';
+                const { data, error } = await supabase
+                    .from('posts')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    list.innerHTML = `<div class="empty-state"><p>📝 No posts yet.</p></div>`;
+                    return;
+                }
+
+                list.innerHTML = '';
+                data.forEach(post => {
+                    const div = document.createElement('div');
+                    div.className = 'admin-post';
+                    const taskCount = (post.tasks || []).length;
+                    const hasSpecial = post.special_note && post.special_note.trim();
+
+                    div.innerHTML = `
+                        <div class="admin-post-info">
+                            <h4>${post.caption || 'Untitled'}</h4>
+                            <p>${(post.description || '').substring(0, 80)}</p>
+                            <div class="post-badges">
+                                ${taskCount ? `<span class="badge task">🎯 ${taskCount} Steps</span>` : ''}
+                                ${hasSpecial ? '<span class="badge special">📌 Special</span>' : ''}
+                                ${post.image_url ? '<span class="badge">📷 Image</span>' : ''}
+                            </div>
+                            <small>📅 ${post.created_at ? new Date(post.created_at).toLocaleDateString() : ''}</small>
+                        </div>
+                        <div class="admin-post-actions">
+                            <button class="btn-edit" onclick="editPost('${post.id}')">✏️ Edit</button>
+                            <button class="btn-danger" onclick="deletePost('${post.id}')">🗑️ Delete</button>
+                        </div>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (err) {
+                console.error(err);
+                list.innerHTML = `<div class="empty-state"><p>❌ Error: ${err.message}</p></div>`;
+            }
+        };
+
+        window.editPost = async function (id) {
+            try {
+                const { data: post, error } = await supabase.from('posts').select('*').eq('id', id).single();
+                if (error) throw error;
+                if (!post) { showToast('Post not found', true); return; }
+
+                document.getElementById('edit-id').value = id;
+                document.getElementById('caption').value = post.caption || '';
+                document.getElementById('description').value = post.description || '';
+                document.getElementById('special-note').value = post.special_note || '';
+                document.getElementById('existing-image').value = post.image_url || '';
+                document.getElementById('final-button-text').value = post.final_button_text || 'Unlock Now';
+                document.getElementById('decoy-link').value = post.decoy_link || '';
+                document.getElementById('final-link').value = post.final_link || '';
+
+                window.setTasksData(post.tasks || []);
+
+                submitBtn.textContent = '🔄 Update Post';
+                document.getElementById('formTitle').textContent = '✏️ Edit Post';
+                document.getElementById('formSubtitle').textContent = 'Update post details';
+
+                document.querySelector('.admin-panel').scrollIntoView({ behavior: 'smooth' });
+                showToast('Edit mode activated');
+            } catch (err) {
+                console.error(err);
+                showToast('Error loading post', true);
+            }
+        };
+
+        window.deletePost = async function (id) {
+            if (!confirm('⚠️ Delete this post?')) return;
+            try {
+                const { data: post } = await supabase.from('posts').select('image_url').eq('id', id).single();
+                if (post?.image_url) {
+                    const fileName = post.image_url.split('/').pop();
+                    await supabase.storage.from('posts').remove([fileName]);
+                }
+                const { error } = await supabase.from('posts').delete().eq('id', id);
+                if (error) throw error;
+                showToast('✅ Deleted!');
+                window.loadAdminPosts();
+            } catch (err) {
+                console.error(err);
+                showToast('Error deleting post', true);
+            }
+        };
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const editId = document.getElementById('edit-id').value;
+            const isEdit = editId !== '';
+            const caption = document.getElementById('caption').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const specialNote = document.getElementById('special-note').value.trim();
+            const imageFile = document.getElementById('image').files[0];
+            const existingImage = document.getElementById('existing-image').value;
+            const tasks = window.getTasksData();
+            const finalButtonText = document.getElementById('final-button-text').value.trim() || 'Unlock Now';
+            const decoyLink = document.getElementById('decoy-link').value.trim();
+            const finalLink = document.getElementById('final-link').value.trim();
+
+            if (!caption) { showToast('⚠️ Caption required', true); return; }
+            if (tasks.length === 0) { showToast('⚠️ Add at least one task', true); return; }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Processing...';
+
+            try {
+                let imageUrl = existingImage || '';
+
+                if (imageFile) {
+                    const fileName = `${Date.now()}_${imageFile.name}`;
+                    const { error: uploadError } = await supabase.storage.from('posts').upload(fileName, imageFile);
+                    if (uploadError) throw uploadError;
+
+                    const { data: urlData } = supabase.storage.from('posts').getPublicUrl(fileName);
+                    imageUrl = urlData.publicUrl;
+
+                    if (isEdit && existingImage) {
+                        const oldFileName = existingImage.split('/').pop();
+                        await supabase.storage.from('posts').remove([oldFileName]);
+                    }
+                }
+
+                const postData = {
+                    caption,
+                    description,
+                    special_note: specialNote,
+                    image_url: imageUrl,
+                    tasks,
+                    final_button_text: finalButtonText,
+                    decoy_link: decoyLink,
+                    final_link: finalLink,
+                    updated_at: new Date()
+                };
+
+                if (isEdit) {
+                    const { error } = await supabase.from('posts').update(postData).eq('id', editId);
+                    if (error) throw error;
+                    showToast('✅ Post updated!');
+                } else {
+                    const { error } = await supabase.from('posts').insert([{ ...postData, created_at: new Date() }]);
+                    if (error) throw error;
+                    showToast('✅ Post created!');
+                }
+
+                window.resetForm();
+                window.loadAdminPosts();
+            } catch (err) {
+                console.error(err);
+                showToast('❌ Error: ' + err.message, true);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = isEdit ? '🔄 Update Post' : '✨ Create Post';
+            }
+        });
+
+        // Add default task row on load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('adminDashboard').classList.contains('active')) {
+                window.loadAdminPosts();
+            }
+            if (document.getElementById('tasks-wrapper').children.length === 0) {
+                window.addTaskRow();
+            }
+        });
+
+        const observer = new MutationObserver(() => {
+            if (document.getElementById('adminDashboard').classList.contains('active')) {
+                window.loadAdminPosts();
+            }
+        });
+        observer.observe(document.getElementById('adminDashboard'), {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+    </script>
+
+</body>
+</html>
