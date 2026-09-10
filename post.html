@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pom Pom Blogs • Unlock</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* ============================================
+           UNLOCK PAGE - Step by Step Design
+           ============================================ */
+        .page-bg {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 30% 20%, rgba(108, 99, 255, 0.08), transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(245, 158, 11, 0.05), transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .post-container { padding: 20px 0 60px; }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #a0a0c0;
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: 0.3s;
+        }
+
+        .back-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+
+        /* SECURITY BADGE */
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: fit-content;
+            margin: 12px auto 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #d0d0f0;
+            backdrop-filter: blur(10px);
+        }
+
+        .security-badge .shield { color: #f59e0b; font-size: 1rem; }
+
+        /* POST INFO CARD */
+        .post-info-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .post-info-image {
+            width: 100%;
+            max-height: 280px;
+            object-fit: cover;
+            display: block;
+            background: #0f0f1a;
+        }
+
+        .post-info-body { padding: 24px 24px 20px; }
+
+        .post-info-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1.2;
+            color: #f0f0ff;
+        }
+
+        .post-info-desc {
+            color: #a0a0c0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 14px;
+            white-space: pre-wrap;
+        }
+
+        .post-info-note {
+            background: rgba(168, 85, 247, 0.08);
+            border-left: 3px solid #a855f7;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: #d0d0f0;
+            font-style: italic;
+        }
+
+        /* STEPS LIST */
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .step-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50px;
+            padding: 14px 20px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card.locked {
+            opacity: 0.55;
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .step-card.active {
+            border-color: rgba(245, 158, 11, 0.5);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.02));
+            box-shadow: 0 0 24px rgba(245, 158, 11, 0.15);
+            animation: stepPulse 2s ease-in-out infinite;
+        }
+
+        .step-card.completed {
+            border-color: rgba(34, 197, 94, 0.4);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.02));
+        }
+
+        @keyframes stepPulse {
+            0%, 100% { box-shadow: 0 0 24px rgba(245, 158, 11, 0.15); }
+            50% { box-shadow: 0 0 32px rgba(245, 158, 11, 0.3); }
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+            transition: 0.3s;
+        }
+
+        .step-card.locked .step-number {
+            background: rgba(255, 255, 255, 0.05);
+            color: #6a6a8a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .step-card.active .step-number {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+        }
+
+        .step-card.completed .step-number {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
+        }
+
+        .step-content { flex: 1; min-width: 0; }
+
+        .step-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 2px;
+            color: #f0f0ff;
+        }
+
+        .step-card.locked .step-title { color: #6a6a8a; }
+
+        .step-status {
+            font-size: 0.8rem;
+            color: #a0a0c0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step-card.active .step-status { color: #f59e0b; font-weight: 600; }
+        .step-card.completed .step-status { color: #22c55e; font-weight: 600; }
+
+        .step-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: none;
+            font-family: inherit;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .step-action.click {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a1a1a;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+        }
+
+        .step-action.click:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 24px rgba(245, 158, 11, 0.5);
+        }
+
+        .step-action.timer {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+            font-variant-numeric: tabular-nums;
+            min-width: 120px;
+        }
+
+        .step-action.done {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            cursor: default;
+        }
+
+        .step-action.locked {
+            background: rgba(255, 255, 255, 0.04);
+            color: #6a6a8a;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            cursor: not-allowed;
+        }
+
+        /* LOCK BAR */
+        .lock-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px 24px;
+            border-radius: 20px;
+            margin-top: 28px;
+            text-align: center;
+            transition: 0.4s;
+        }
+
+        .lock-bar.locked { border-style: dashed; }
+
+        .lock-bar.unlocked {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), rgba(34, 197, 94, 0.04));
+            border-color: rgba(34, 197, 94, 0.4);
+            border-style: solid;
+        }
+
+        .lock-bar .lock-icon { font-size: 1.3rem; flex-shrink: 0; }
+
+        .lock-bar .lock-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #a0a0c0;
+        }
+
+        .lock-bar.unlocked .lock-text { color: #22c55e; }
+
+        /* FINAL BUTTON */
+        .final-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 18px 32px;
+            border-radius: 50px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: none;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            margin-top: 16px;
+        }
+
+        .final-btn.stage-1 {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.35);
+            animation: greenPulse 2s ease-in-out infinite;
+        }
+
+        .final-btn.stage-1:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(34, 197, 94, 0.5);
+        }
+
+        .final-btn.stage-2 {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1a1a1a;
+            box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4);
+            animation: orangePulse 2s ease-in-out infinite;
+        }
+
+        .final-btn.stage-2:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(245, 158, 11, 0.6);
+        }
+
+        @keyframes greenPulse {
+            0%, 100% { box-shadow: 0 8px 32px rgba(34, 197, 94, 0.35); }
+            50% { box-shadow: 0 8px 40px rgba(34, 197, 94, 0.55); }
+        }
+
+        @keyframes orangePulse {
+            0%, 100% { box-shadow: 0 8px 32px rgba(245, 158, 11, 0.4); }
+            50% { box-shadow: 0 8px 40px rgba(245, 158, 11, 0.6); }
+        }
+
+        /* STATES */
+        .state-container {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.06);
+            border-top: 4px solid #6c63ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        /* MOBILE */
+        @media (max-width: 600px) {
+            .step-card { padding: 12px 14px; gap: 10px; }
+            .step-number { width: 34px; height: 34px; font-size: 0.9rem; }
+            .step-title { font-size: 0.9rem; }
+            .step-status { font-size: 0.72rem; }
+            .step-action { padding: 8px 16px; font-size: 0.78rem; min-width: 90px; }
+            .step-action.timer { min-width: 90px; }
+            .post-info-title { font-size: 1.15rem; }
+            .post-info-body { padding: 18px; }
+            .security-badge { font-size: 0.78rem; padding: 6px 16px; }
+            .lock-bar { padding: 16px; }
+            .lock-text { font-size: 0.8rem; }
+            .final-btn { font-size: 0.95rem; padding: 16px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-bg"></div>
+
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">✦ Pom Pom Blogs</a>
+            <a href="index.html" class="back-btn">← Back</a>
+        </div>
+    </nav>
+
+    <main class="container post-container">
+        <div class="security-badge">
+            <span class="shield">🛡️</span>
+            <span id="badge-text">2 Layers Security</span>
+        </div>
+
+        <div id="post-container"></div>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script type="module">
+        // ============================================
+        // SUPABASE CONFIG
+        // ============================================
+        const SUPABASE_URL = 'https://oofuqokpdvlomtnjvfvk.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_nt4makZoISds9-x7ID1_0Q_xYIrBdK5';
+
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const container = document.getElementById('post-container');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentPost = null;
+        let taskStates = []; // { status: 'locked'|'active'|'completed', remaining, isRunning }
+        let activeTimerIndex = null;
+        let finalStage = 1;
+        let timerInterval = null;
+
+        // ============================================
+        // TOAST
+        // ============================================
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.textContent = msg;
+            toastContainer.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transform = 'translateY(20px)';
+                setTimeout(() => t.remove(), 300);
+            }, 2800);
+        }
+
+        // ============================================
+        // POST ID
+        // ============================================
+        function getPostId() {
+            return new URLSearchParams(window.location.search).get('id');
+        }
+
+        // ============================================
+        // LOCAL STORAGE
+        // ============================================
+        function storageKey() { return `pom_progress_${getPostId()}`; }
+
+        function saveProgress() {
+            try {
+                const data = {
+                    states: taskStates.map(s => ({
+                        status: s.status,
+                        remaining: s.remaining
+                    })),
+                    finalStage,
+                    ts: Date.now()
+                };
+                localStorage.setItem(storageKey(), JSON.stringify(data));
+            } catch (e) { /* ignore */ }
+        }
+
+        function loadProgress() {
+            try {
+                const raw = localStorage.getItem(storageKey());
+                return raw ? JSON.parse(raw) : null;
+            } catch { return null; }
+        }
+
+        // ============================================
+        // RENDER STATES
+        // ============================================
+        function renderLoading() {
+            container.innerHTML = `
+                <div class="state-container">
+                    <div class="loading-spinner"></div>
+                    <p style="color:#a0a0c0;">Loading...</p>
+                </div>
+            `;
+        }
+
+        function renderError(msg) {
+            container.innerHTML = `<div class="state-container"><h2>⚠️ Error</h2><p>${msg}</p></div>`;
+        }
+
+        function renderNotFound() {
+            container.innerHTML = `<div class="state-container"><h2>🔍 Post not found</h2></div>`;
+        }
+
+        // ============================================
+        // RENDER POST
+        // ============================================
+        function renderPost(post) {
+            const title = post.caption || 'Untitled';
+            const description = post.description || '';
+            const specialNote = post.special_note || '';
+            const imageUrl = post.image_url || '';
+            const tasks = post.tasks || [];
+            const finalText = post.final_button_text || 'Unlock Now';
+
+            document.getElementById('badge-text').textContent = `${tasks.length} Layers Security`;
+
+            // Restore progress
+            const saved = loadProgress();
+            const validSave = saved && saved.states && saved.states.length === tasks.length;
+
+            taskStates = tasks.map((_, i) => {
+                if (validSave && saved.states[i]) {
+                    const s = saved.states[i];
+                    return {
+                        status: s.status === 'active' ? 'active' : s.status,
+                        remaining: typeof s.remaining === 'number' ? s.remaining : 5,
+                        isRunning: false
+                    };
+                }
+                return {
+                    status: i === 0 ? 'active' : 'locked',
+                    remaining: 5,
+                    isRunning: false
+                };
+            });
+
+            if (validSave && saved.finalStage) finalStage = saved.finalStage;
+
+            const allCompleted = taskStates.every(s => s.status === 'completed');
+
+            // Special note
+            const noteHTML = specialNote.trim() ?
+                `<div class="post-info-note">${specialNote}</div>` : '';
+
+            // Steps HTML
+            const stepsHTML = tasks.map((task, i) => {
+                const state = taskStates[i];
+                const isLocked = state.status === 'locked';
+                const isActive = state.status === 'active';
+                const isCompleted = state.status === 'completed';
+
+                let cardClass = 'step-card';
+                if (isLocked) cardClass += ' locked';
+                if (isActive) cardClass += ' active';
+                if (isCompleted) cardClass += ' completed';
+
+                let statusText = '';
+                if (isLocked) statusText = '🔒 Restricted';
+                else if (isCompleted) statusText = '✅ Completed';
+                else if (isActive && state.isRunning) statusText = `⏳ ${state.remaining}s remaining`;
+                else if (isActive && state.remaining < 5) statusText = `⏸ Paused (${state.remaining}s left)`;
+                else statusText = '⏸ Ready to start';
+
+                let btnHTML = '';
+                if (isLocked) {
+                    btnHTML = `<button class="step-action locked" disabled>🔒 Locked</button>`;
+                } else if (isCompleted) {
+                    btnHTML = `<button class="step-action done" disabled>✅ Done</button>`;
+                } else if (isActive && state.isRunning) {
+                    btnHTML = `<button class="step-action timer" disabled id="task-btn-${i}">⏳ ${state.remaining}s</button>`;
+                } else if (isActive && state.remaining < 5) {
+                    btnHTML = `<button class="step-action click" onclick="startTask(${i})" id="task-btn-${i}">▶️ Continue (${state.remaining}s)</button>`;
+                } else {
+                    btnHTML = `<button class="step-action click" onclick="startTask(${i})" id="task-btn-${i}">🔗 Click Here</button>`;
+                }
+
+                return `
+                    <div class="${cardClass}" id="task-card-${i}">
+                        <div class="step-number" id="task-num-${i}">${i + 1}</div>
+                        <div class="step-content">
+                            <div class="step-title">${task.name || 'Step ' + (i + 1)}</div>
+                            <div class="step-status" id="task-status-${i}">${statusText}</div>
+                        </div>
+                        ${btnHTML}
+                    </div>
+                `;
+            }).join('');
+
+            // Lock bar + final button
+            const finalHTML = allCompleted ? `
+                <button class="final-btn ${finalStage === 2 ? 'stage-2' : 'stage-1'}" 
+                        onclick="handleFinal()" id="final-btn">
+                    ${finalStage === 2 ? '🔓 Click Again to Download' : `⬇️ ${finalText}`}
+                </button>
+            ` : '';
+
+            container.innerHTML = `
+                <div class="post-info-card">
+                    ${imageUrl ? `<img class="post-info-image" src="${imageUrl}" alt="${title}" onerror="this.style.display='none'">` : ''}
+                    <div class="post-info-body">
+                        <h1 class="post-info-title">${title}</h1>
+                        ${description ? `<p class="post-info-desc">${description}</p>` : ''}
+                        ${noteHTML}
+                    </div>
+                </div>
+
+                <div class="steps-list">${stepsHTML}</div>
+
+                <div class="lock-bar ${allCompleted ? 'unlocked' : 'locked'}" id="lock-bar">
+                    <span class="lock-icon">${allCompleted ? '✅' : '🔒'}</span>
+                    <span class="lock-text" id="lock-text">
+                        ${allCompleted ? 'All steps completed' : 'Complete all steps to unlock'}
+                    </span>
+                </div>
+
+                ${finalHTML}
+            `;
+
+            document.title = `${title} • Pom Pom Blogs`;
+        }
+
+        // ============================================
+        // START TASK
+        // ============================================
+        window.startTask = function (index) {
+            const task = currentPost.tasks[index];
+            const state = taskStates[index];
+
+            if (!task || !state) return;
+            if (state.status === 'completed') return;
+            if (state.status === 'locked') {
+                showToast('⚠️ Complete previous steps first', 'warning');
+                return;
+            }
+
+            // Open link in new tab
+            window.open(task.url, '_blank', 'noopener');
+
+            // Set state
+            state.isRunning = true;
+            activeTimerIndex = index;
+
+            const card = document.getElementById(`task-card-${index}`);
+            const btn = document.getElementById(`task-btn-${index}`);
+            const status = document.getElementById(`task-status-${index}`);
+
+            if (card) card.classList.add('active');
+            if (btn) {
+                btn.className = 'step-action timer';
+                btn.textContent = `⏳ ${state.remaining}s`;
+                btn.disabled = true;
+            }
+            if (status) status.textContent = `⏳ ${state.remaining}s remaining`;
+
+            runTimer(index);
+        };
+
+        // ============================================
+        // TIMER
+        // ============================================
+        function runTimer(index) {
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
+                const state = taskStates[index];
+                if (!state || !state.isRunning) return;
+
+                state.remaining -= 1;
+
+                const btn = document.getElementById(`task-btn-${index}`);
+                const status = document.getElementById(`task-status-${index}`);
+
+                if (state.remaining > 0) {
+                    if (btn) btn.textContent = `⏳ ${state.remaining}s`;
+                    if (status) status.textContent = `⏳ ${state.remaining}s remaining`;
+                    saveProgress();
+                } else {
+                    // COMPLETE
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                    state.isRunning = false;
+                    state.status = 'completed';
+                    state.remaining = 0;
+                    activeTimerIndex = null;
+
+                    const card = document.getElementById(`task-card-${index}`);
+                    if (card) {
+                        card.classList.remove('active');
+                        card.classList.add('completed');
+                    }
+                    if (btn) {
+                        btn.className = 'step-action done';
+                        btn.textContent = '✅ Done';
+                        btn.disabled = true;
+                    }
+                    if (status) status.textContent = '✅ Completed';
+
+                    showToast(`✅ Step ${index + 1} completed!`, 'success');
+
+                    unlockNextStep(index);
+                    saveProgress();
+                    checkAllCompleted();
+                }
+            }, 1000);
+        }
+
+        // ============================================
+        // UNLOCK NEXT STEP
+        // ============================================
+        function unlockNextStep(currentIndex) {
+            const nextIndex = currentIndex + 1;
+            if (nextIndex >= taskStates.length) return;
+
+            const nextState = taskStates[nextIndex];
+            if (nextState.status === 'locked') {
+                nextState.status = 'active';
+                nextState.remaining = 5;
+
+                const card = document.getElementById(`task-card-${nextIndex}`);
+                const btn = document.getElementById(`task-btn-${nextIndex}`);
+                const status = document.getElementById(`task-status-${nextIndex}`);
+
+                if (card) {
+                    card.classList.remove('locked');
+                    card.classList.add('active');
+                }
+                if (btn) {
+                    btn.className = 'step-action click';
+                    btn.textContent = '🔗 Click Here';
+                    btn.disabled = false;
+                    btn.onclick = () => startTask(nextIndex);
+                }
+                if (status) status.textContent = '⏸ Ready to start';
+            }
+        }
+
+        // ============================================
+        // PAUSE ON TAB HIDDEN
+        // ============================================
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Pause active timer
+                if (activeTimerIndex !== null && taskStates[activeTimerIndex]?.isRunning) {
+                    const idx = activeTimerIndex;
+                    const state = taskStates[idx];
+                    state.isRunning = false;
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                    }
+                    saveProgress();
+
+                    const btn = document.getElementById(`task-btn-${idx}`);
+                    const status = document.getElementById(`task-status-${idx}`);
+                    if (btn) {
+                        btn.className = 'step-action click';
+                        btn.textContent = `▶️ Continue (${state.remaining}s)`;
+                        btn.disabled = false;
+                    }
+                    if (status) status.textContent = `⏸ Paused (${state.remaining}s left)`;
+                }
+            }
+        });
+
+        // ============================================
+        // CHECK ALL COMPLETED
+        // ============================================
+        function checkAllCompleted() {
+            const allDone = taskStates.every(s => s.status === 'completed');
+            if (!allDone) return;
+
+            const lockBar = document.getElementById('lock-bar');
+            const lockText = document.getElementById('lock-text');
+            const lockIcon = lockBar?.querySelector('.lock-icon');
+
+            if (lockBar) {
+                lockBar.classList.remove('locked');
+                lockBar.classList.add('unlocked');
+            }
+            if (lockText) lockText.textContent = 'All steps completed';
+            if (lockIcon) lockIcon.textContent = '✅';
+
+            // Remove old final button if exists
+            const oldBtn = document.getElementById('final-btn');
+            if (oldBtn) oldBtn.remove();
+
+            // Add final button
+            const finalBtn = document.createElement('button');
+            finalBtn.id = 'final-btn';
+            finalBtn.className = `final-btn ${finalStage === 2 ? 'stage-2' : 'stage-1'}`;
+            finalBtn.textContent = finalStage === 2
+                ? '🔓 Click Again to Download'
+                : `⬇️ ${currentPost.final_button_text || 'Unlock Now'}`;
+            finalBtn.onclick = handleFinal;
+
+            lockBar.insertAdjacentElement('afterend', finalBtn);
+
+            showToast('🎉 All steps done! Unlocked.', 'success');
+        }
+
+        // ============================================
+        // FINAL BUTTON (2-stage)
+        // ============================================
+        window.handleFinal = function () {
+            const btn = document.getElementById('final-btn');
+            if (!btn) return;
+
+            if (finalStage === 1) {
+                if (currentPost.decoy_link) {
+                    window.open(currentPost.decoy_link, '_blank', 'noopener');
+                }
+                finalStage = 2;
+                saveProgress();
+
+                btn.className = 'final-btn stage-2';
+                btn.textContent = '🔓 Click Again to Download';
+                showToast('🔓 Click one more time!', 'warning');
+            } else {
+                if (currentPost.final_link) {
+                    window.location.href = currentPost.final_link;
+                } else {
+                    showToast('⚠️ No final link set', 'warning');
+                }
+            }
+        };
+
+        // ============================================
+        // LOAD POST
+        // ============================================
+        async function loadPost() {
+            const postId = getPostId();
+            if (!postId) { renderError('No post ID'); return; }
+
+            renderLoading();
+
+            try {
+                const { data, error } = await supabase
+                    .from('posts')
+                    .select('*')
+                    .eq('id', postId)
+                    .single();
+
+                if (error) throw error;
+                if (!data) { renderNotFound(); return; }
+
+                currentPost = data;
+                renderPost(data);
+            } catch (err) {
+                console.error(err);
+                renderError('Failed to load post.');
+            }
+        }
+
+        loadPost();
+        console.log('✨ Unlock page ready');
+    </script>
+
+</body>
+</html>
